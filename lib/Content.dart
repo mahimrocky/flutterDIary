@@ -10,6 +10,7 @@ class Content extends StatefulWidget {
 class ContentState extends State<Content> {
   String title = "";
   String content = "";
+  String time = "";
 
   TextEditingController editingController = new TextEditingController();
   TextEditingController titleController = new TextEditingController();
@@ -29,9 +30,10 @@ class ContentState extends State<Content> {
               setState(() {
                 content = content + editingController.text;
                 title = title + titleController.text;
-
                 if (title.length > 1 && content.length > 1) {
-                  DiaryModel model = new DiaryModel(title, content, "time");
+                  time += new DateTime.now()
+                      .toIso8601String(); // getting time from System
+                  DiaryModel model = new DiaryModel(title, content, time);
                   DatabaseHelper.get().insertOrReplace(model);
 
                   Navigator.of(context).pop(true);

@@ -5,6 +5,7 @@ import 'package:flutter_diary/homeScreen.dart';
 
 void main() {
   runApp(new MaterialApp(
+    debugShowCheckedModeBanner: false,
     home: new SplashScreen(),
     routes: <String, WidgetBuilder>{
       '/HomeScreen': (BuildContext context) => new HomeScreen()
@@ -39,8 +40,7 @@ class SplashScreenState extends State<SplashScreen>
     animationController =
         new AnimationController(vsync: this, duration: new Duration(seconds: 2))
           ..addStatusListener((status) {
-
-            if(status==AnimationStatus.completed){
+            if (status == AnimationStatus.completed) {
               gotoHome();
             }
           });

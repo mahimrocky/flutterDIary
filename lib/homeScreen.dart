@@ -3,6 +3,8 @@ import 'package:flutter_diary/Content.dart';
 import 'package:flutter_diary/DatabaseHelper.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart';
+import 'dart:developer';
+import 'package:flutter/foundation.dart';
 
 List<DiaryModel> diaryList = new List();
 
@@ -12,8 +14,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
-
-
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -111,19 +111,29 @@ class CustomItemState extends State<CustomItem> {
             builder: (BuildContext context) {
               return new AlertDialog(
                 content: new FlatButton(
-                  onPressed: () => performDelete(model, context),
+                  onPressed: () {
+                    int result = performDelete(model, context);
+                    debugPrint("DBResult: $result");
+                    if (result > 0) {
+                      setState((){
+                        final snackBar =
+                        SnackBar(content: Text("Delte succefully"));
+                        Scaffold.of(context).showSnackBar(snackBar);
+                      });
+                    }
+                  },
                   child: new Text("Delete"),
                 ),
               );
-            }).then((val){
-              new HomeScreenState().refresh();
+            }).then((val) {
+          //new HomeScreenState().refresh();
         });
       },
       behavior: HitTestBehavior.opaque,
       child: new Container(
         height: 50.0,
         margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
-        child: titleSection(context, model.title, model.content),
+        child: titleSection(context, model.title, model.content, model.time),
       ),
     );
   }
@@ -132,7 +142,8 @@ class CustomItemState extends State<CustomItem> {
   * Card widget where we distribute data and design
   * */
 
-  Widget titleSection(BuildContext context, String title, String content) {
+  Widget titleSection(
+      BuildContext context, String title, String content, String time) {
     return new GestureDetector(
       child: new Container(
         child: new Row(
@@ -152,7 +163,7 @@ class CustomItemState extends State<CustomItem> {
               ),
             ),
             new Text(
-              "time",
+              time,
               style: new TextStyle(
                 color: Colors.grey[500],
                 fontSize: 10.0,
@@ -169,23 +180,24 @@ class CustomItemState extends State<CustomItem> {
     );
   }
 
-  performDelete(DiaryModel model, BuildContext context) {
+  int performDelete(DiaryModel model, BuildContext context) {
     int r = 0;
     DatabaseHelper.get().deleteItem(model.id).then((result) {
-      setState(() {
+       setState(() {
         final snackBar = SnackBar(content: Text("Delte succefully"));
         Scaffold.of(context).showSnackBar(snackBar);
       });
+      debugPrint("DBResult: $result");
+      return result;
     });
 
     Navigator.of(context).pop(true);
 
-
+    return r;
   }
 
   @override
   void setState(VoidCallback fn) {
-    // TODO: implement setState
     super.setState(fn);
   }
 }
